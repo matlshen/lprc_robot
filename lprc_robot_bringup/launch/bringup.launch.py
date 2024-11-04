@@ -9,20 +9,44 @@ from launch.conditions import IfCondition, UnlessCondition
 
 def generate_launch_description():
 
+    description_launch_path = PathJoinSubstitution(
+        [FindPackageShare('lprc_robot_description'), 'launch', 'description.launch.py']
+    )
+
     laser_launch_path = PathJoinSubstitution(
         [FindPackageShare('sllidar_ros2'), 'launch', 'sllidar_a1_launch.py']
     )
 
+    odom_launch_path = PathJoinSubstitution(
+        [FindPackageShare('rf2o_laser_odometry'), 'launch', 'rf2o_laser_odometry.launch.py']
+    )
+
+    slam_launch_path = PathJoinSubstitution(
+        [FindPackageShare('slam_toolbox'), 'launch', 'online_async_launch.py']
+    )
+
     return LaunchDescription([
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(description_launch_path)
+        ),
+        
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(laser_launch_path)
         ),
 
-
-        # Generate /scan_odom topic from /scan
-        Node(
-            package='rf2o_laser_odometry',
-            executable='rf2o_laser_odometry_node',
-            name='rf2o_laser_odometry_node',
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(odom_launch_path),
+            launch_arguments={
+                'laser_scan_topic': '/scan',
+                'odom_topic': '/scan_odom',
+            }.items()
         ),
+
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(slam_launch_path),
+            launch_arguments={
+                'odom_topic': '/scan_odom',
+                'scan_topic': '/scan',
+            }.items()
+        )
     ])

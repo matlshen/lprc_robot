@@ -22,7 +22,6 @@ from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
-    robot_base = os.getenv('LINOROBOT2_BASE')
 
     urdf_path = PathJoinSubstitution(
         [FindPackageShare("lprc_robot_description"), "urdf/robots", f"mecanum.urdf.xacro"]
@@ -77,6 +76,40 @@ def generate_launch_description():
                     'use_sim_time': LaunchConfiguration('use_sim_time'),
                     'robot_description': Command(['xacro ', LaunchConfiguration('urdf')])
                 }
+            ]
+        ),
+
+        # Set up transform from base_link to laser
+        # Node(
+        #     package='tf2_ros',
+        #     executable='static_transform_publisher',
+        #     name='tf2_static_transform_publisher',
+        #     parameters=[
+        #         {'x': '0'},
+        #         {'y': '0'},
+        #         {'z': '0.1'},
+        #         {'yaw': '0'},
+        #         {'pitch': '0'},
+        #         {'roll': '0'},
+        #         {'frame_id': 'base_link'},
+        #         {'child_frame_id': 'laser'}
+        #     ]
+        # ),
+
+        # Set up transform from base_footprint to base_link
+        Node(
+            package='tf2_ros',
+            executable='static_transform_publisher',
+            name='tf2_static_transform_publisher',
+            parameters=[
+                {'x': '0'},
+                {'y': '0'},
+                {'z': '0'},
+                {'yaw': '0'},
+                {'pitch': '0'},
+                {'roll': '0'},
+                {'frame_id': 'base_link'},
+                {'child_frame_id': 'base_footprint'}
             ]
         ),
 
