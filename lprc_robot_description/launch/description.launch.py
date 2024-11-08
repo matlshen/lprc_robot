@@ -28,7 +28,7 @@ def generate_launch_description():
     )
 
     rviz_config_path = PathJoinSubstitution(
-        [FindPackageShare('linorobot2_description'), 'rviz', 'description.rviz']
+        [FindPackageShare('lprc_robot_description'), 'rviz', 'description.rviz']
     )
 
     return LaunchDescription([
